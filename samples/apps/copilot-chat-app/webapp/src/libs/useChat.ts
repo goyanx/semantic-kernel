@@ -176,6 +176,7 @@ export const useChat = () => {
                 prompt: result.variables.find((v) => v.key === 'prompt')?.value,
                 authorRole: AuthorRoles.Bot,
                 state: PlanUtils.isPlan(result.value) ? ChatMessageState.PlanApprovalRequired : ChatMessageState.NoOp,
+                imageUrl: result.variables.find((v) => v.key === 'imageUrl')?.value,
             };
 
             dispatch(updateConversation({ message: messageResult, chatId: chatId }));

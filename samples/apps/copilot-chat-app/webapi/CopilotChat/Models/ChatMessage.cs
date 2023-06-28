@@ -110,6 +110,9 @@ public class ChatMessage : IStorageEntity
     [JsonPropertyName("type")]
     public ChatMessageType Type { get; set; }
 
+    [JsonPropertyName("imageUrl")]
+    public string ImageUrl { get; set; }
+
     /// <summary>
     /// Create a new chat message. Timestamp is automatically generated.
     /// </summary>
@@ -120,7 +123,7 @@ public class ChatMessage : IStorageEntity
     /// <param name="prompt">The prompt used to generate the message</param>
     /// <param name="authorRole">Role of the author</param>
     /// <param name="type">Type of the message</param>
-    public ChatMessage(string userId, string userName, string chatId, string content, string prompt = "", AuthorRoles authorRole = AuthorRoles.User, ChatMessageType type = ChatMessageType.Message)
+    public ChatMessage(string userId, string userName, string chatId, string content, string prompt = "", AuthorRoles authorRole = AuthorRoles.User, ChatMessageType type = ChatMessageType.Message, string imageUrl = "")
     {
         this.Timestamp = DateTimeOffset.Now;
         this.UserId = userId;
@@ -131,6 +134,7 @@ public class ChatMessage : IStorageEntity
         this.Prompt = prompt;
         this.AuthorRole = authorRole;
         this.Type = type;
+        this.ImageUrl = imageUrl;
     }
 
     /// <summary>
@@ -139,9 +143,10 @@ public class ChatMessage : IStorageEntity
     /// <param name="chatId">The chat ID that this message belongs to</param>
     /// <param name="content">The message</param>
     /// <param name="prompt">The prompt used to generate the message</param>
-    public static ChatMessage CreateBotResponseMessage(string chatId, string content, string prompt)
+    /// <param name="imageUrl">The imageUrl to show pertaining to the prompt</param>
+    public static ChatMessage CreateBotResponseMessage(string chatId, string content, string prompt, string imageUrl)
     {
-        return new ChatMessage("bot", "bot", chatId, content, prompt, AuthorRoles.Bot, IsPlan(content) ? ChatMessageType.Plan : ChatMessageType.Message);
+        return new ChatMessage("bot", "bot", chatId, content, prompt, AuthorRoles.Bot, IsPlan(content) ? ChatMessageType.Plan : ChatMessageType.Message, imageUrl);
     }
 
     /// <summary>

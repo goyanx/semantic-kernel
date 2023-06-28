@@ -13,7 +13,7 @@ internal sealed class SearchVectorsRequest : IValidatable
     public IEnumerable<float> StartingVector { get; set; } = System.Array.Empty<float>();
 
     [JsonPropertyName("filter")]
-    public QdrantFilter Filters { get; set; }
+    public Filter Filters { get; set; }
 
     [JsonPropertyName("limit")]
     public int Limit { get; set; }
@@ -68,14 +68,6 @@ internal sealed class SearchVectorsRequest : IValidatable
         return this;
     }
 
-    public SearchVectorsRequest WithFilters(QdrantFilter? filters)
-    {
-        if (filters == null) { return this; }
-
-        this.Filters = filters;
-        return this;
-    }
-
     public SearchVectorsRequest WithScoreThreshold(double threshold)
     {
         this.ScoreThreshold = threshold;
@@ -127,6 +119,74 @@ internal sealed class SearchVectorsRequest : IValidatable
             payload: this);
     }
 
+    internal sealed class Filter : IValidatable
+    {
+        internal sealed class Match : IValidatable
+        {
+            [JsonPropertyName("value")]
+            public object Value { get; set; }
+
+            public Match()
+            {
+                this.Value = string.Empty;
+            }
+
+            public void Validate()
+            {
+            }
+        }
+
+        internal sealed class Must : IValidatable
+        {
+            [JsonPropertyName("key")]
+            public string Key { get; set; }
+
+            [JsonPropertyName("match")]
+            public Match Match { get; set; }
+
+            public Must()
+            {
+                this.Match = new();
+                this.Key = string.Empty;
+            }
+
+            public Must(string key, object value) : this()
+            {
+                this.Key = key;
+                this.Match.Value = value;
+            }
+
+            public void Validate()
+            {
+                Verify.NotNull(this.Key, "The filter key is NULL");
+                Verify.NotNull(this.Match, "The filter match is NULL");
+            }
+        }
+
+        [JsonPropertyName("must")]
+        public List<Must> Conditions { get; set; }
+
+        internal Filter()
+        {
+            this.Conditions = new();
+        }
+
+        internal Filter ValueMustMatch(string key, object value)
+        {
+            this.Conditions.Add(new Must(key, value));
+            return this;
+        }
+
+        public void Validate()
+        {
+            Verify.NotNull(this.Conditions, "Filter conditions are NULL");
+            foreach (var x in this.Conditions)
+            {
+                x.Validate();
+            }
+        }
+    }
+
     #region private ================================================================================
 
     private readonly string _collectionName;
@@ -134,7 +194,7 @@ internal sealed class SearchVectorsRequest : IValidatable
     private SearchVectorsRequest(string collectionName)
     {
         this._collectionName = collectionName;
-        this.Filters = new QdrantFilter();
+        this.Filters = new Filter();
         this.WithPayload = false;
         this.WithVector = false;
 

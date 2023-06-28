@@ -258,7 +258,13 @@ public class ChatSkill
         // Save this response to memory such that subsequent chat responses can use it
         try
         {
-            var botMessage = await this.SaveNewResponseAsync(response, prompt, chatId);
+            var imageurl = chatContext.Variables.ContainsKey("imageUrl")
+            ? chatContext.Variables["imageUrl"]
+            : string.Empty;
+            context.Log.LogInformation($"[ChatAsync] getting the imageurl: {imageurl}");
+
+            context.Variables.Set("imageUrl", imageurl);
+            var botMessage = await this.SaveNewResponseAsync(response, prompt, chatId, imageurl);
             context.Variables.Set("messageType", botMessage.Type.ToString());
         }
         catch (Exception ex) when (!ex.IsCriticalException())
@@ -559,12 +565,12 @@ public class ChatSkill
     /// <param name="prompt">Prompt used to generate the response.</param>
     /// <param name="chatId">The chat ID</param>
     /// <returns>The created chat message.</returns>
-    private async Task<ChatMessage> SaveNewResponseAsync(string response, string prompt, string chatId)
+    private async Task<ChatMessage> SaveNewResponseAsync(string response, string prompt, string chatId, string imageUrl)
     {
         // Make sure the chat exists.
         await this._chatSessionRepository.FindByIdAsync(chatId);
 
-        var chatMessage = ChatMessage.CreateBotResponseMessage(chatId, response, prompt);
+        var chatMessage = ChatMessage.CreateBotResponseMessage(chatId, response, prompt, imageUrl);
         await this._chatMessageRepository.CreateAsync(chatMessage);
 
         return chatMessage;

@@ -3,6 +3,7 @@
 using System.Threading.Tasks;
 using Microsoft.SemanticKernel;
 using Microsoft.SemanticKernel.Planning;
+using Microsoft.SemanticKernel.Planning.Sequential;
 using Microsoft.SemanticKernel.SkillDefinition;
 using SemanticKernel.Service.CopilotChat.Options;
 
@@ -49,7 +50,8 @@ public class CopilotChatPlanner
 
         if (this._plannerOptions?.Type == "Sequential")
         {
-            return new SequentialPlanner(this.Kernel).CreatePlanAsync(goal);
+            //return new SequentialPlanner(this.Kernel).CreatePlanAsync(goal);
+            return new SequentialPlanner(this.Kernel, new SequentialPlannerConfig { RelevancyThreshold = 0.75 }).CreatePlanAsync(goal);
         }
 
         return new ActionPlanner(this.Kernel).CreatePlanAsync(goal);

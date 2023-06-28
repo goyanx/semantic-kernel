@@ -39,6 +39,7 @@ export interface IChatMessage {
     authorRole: AuthorRoles;
     debug?: string;
     state?: ChatMessageState; // if plan needs approval
+    imageUrl?: string;
 }
 
 export enum ChatMessageState {

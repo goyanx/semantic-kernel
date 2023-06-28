@@ -61,6 +61,15 @@ const useClasses = makeStyles({
         width: '100%',
         textAlign: 'center',
     },
+    flexContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+    },
+    gif: {
+        marginLeft: 'auto',
+        width: '600px', // adjust this to your needs
+        height: 'auto',
+    },
 });
 
 interface ChatHistoryItemProps {
@@ -86,6 +95,7 @@ export const ChatHistoryItem: React.FC<ChatHistoryItemProps> = ({ message, getRe
 
     const plan = parsePlan(message.content);
     const isPlan = plan !== null;
+
 
     // Initializing Plan action handlers here so we don't have to drill down data the components won't use otherwise
     const onPlanApproval = async () => {
@@ -163,12 +173,15 @@ export const ChatHistoryItem: React.FC<ChatHistoryItemProps> = ({ message, getRe
                         <Text className={classes.time}>{timestampToDateString(message.timestamp, true)}</Text>
                         {isBot && <PromptDetails message={message} />}
                     </div>
-                    {!isPlan && (
-                        <div
-                            className={classes.content}
-                            dangerouslySetInnerHTML={{ __html: convertToAnchorTags(content) }}
-                        />
-                    )}
+                    <div className={classes.flexContainer}>
+                        {!isPlan && (
+                            <div
+                                className={classes.content}
+                                dangerouslySetInnerHTML={{ __html: convertToAnchorTags(content) }}
+                            />
+                        )}
+                        {isBot && message.imageUrl && <img className={classes.gif} src={message.imageUrl} alt="Generated" />}
+                    </div>
                     {isPlan && (
                         <PlanViewer
                             plan={plan}

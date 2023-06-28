@@ -29,7 +29,9 @@ public class ChatHistoryController : ControllerBase
     private readonly ChatSessionRepository _sessionRepository;
     private readonly ChatMessageRepository _messageRepository;
     private readonly PromptsOptions _promptOptions;
+    private readonly IKernel _kernel;
     private readonly ChatMemorySourceRepository _sourceRepository;
+
 
     /// <summary>
     /// Initializes a new instance of the <see cref="ChatHistoryController"/> class.
@@ -44,13 +46,16 @@ public class ChatHistoryController : ControllerBase
         ChatSessionRepository sessionRepository,
         ChatMessageRepository messageRepository,
         ChatMemorySourceRepository sourceRepository,
-        IOptions<PromptsOptions> promptsOptions)
+        IOptions<PromptsOptions> promptsOptions,
+        IKernel kernel)
     {
         this._logger = logger;
         this._sessionRepository = sessionRepository;
         this._messageRepository = messageRepository;
         this._sourceRepository = sourceRepository;
         this._promptOptions = promptsOptions.Value;
+        this._kernel = kernel;
+
     }
 
     /// <summary>
@@ -74,7 +79,7 @@ public class ChatHistoryController : ControllerBase
 
         var initialBotMessage = this._promptOptions.InitialBotMessage;
         // The initial bot message doesn't need a prompt.
-        await this.SaveResponseAsync(initialBotMessage, string.Empty, newChat.Id);
+        await this.SaveResponseAsync(initialBotMessage, string.Empty, newChat.Id, "");
 
         this._logger.LogDebug("Created chat session with id {0} for user {1}", newChat.Id, userId);
         return this.CreatedAtAction(nameof(this.GetChatSessionByIdAsync), new { chatId = newChat.Id }, newChat);
@@ -227,12 +232,12 @@ public class ChatHistoryController : ControllerBase
     /// <param name="response">The bot response.</param>
     /// <param name="prompt">The prompt that was used to generate the response.</param>
     /// <param name="chatId">The chat id.</param>
-    private async Task SaveResponseAsync(string response, string prompt, string chatId)
+    private async Task SaveResponseAsync(string response, string prompt, string chatId, string imageUrl)
     {
         // Make sure the chat session exists
         await this._sessionRepository.FindByIdAsync(chatId);
 
-        var chatMessage = ChatMessage.CreateBotResponseMessage(chatId, response, prompt);
+        var chatMessage = ChatMessage.CreateBotResponseMessage(chatId, response, prompt, imageUrl);
         await this._messageRepository.CreateAsync(chatMessage);
     }
 

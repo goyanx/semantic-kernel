@@ -22,22 +22,10 @@ public class SemanticChatMemory
     /// Create and add a chat memory item.
     /// </summary>
     /// <param name="label">Label for the chat memory item.</param>
-    /// <param name="category">Category of the chat memory item.</param>
     /// <param name="details">Details for the chat memory item.</param>
-    public void AddItem(string label, string category, string details)
+    public void AddItem(string label, string details)
     {
-        this.Items.Add(new SemanticChatMemoryItem(label, category, details));
-    }
-
-    /// <summary>
-    /// Create and add a chat memory item with an array of details.
-    /// </summary>
-    /// <param name="label">Label for the chat memory item.</param>
-    /// <param name="category">Category of the chat memory item.</param>
-    /// <param name="details">Array of details for the chat memory item.</param>
-    public void AddItem(string label, string category, string[] details)
-    {
-        this.Items.Add(new SemanticChatMemoryItem(label, category, details));
+        this.Items.Add(new SemanticChatMemoryItem(label, details));
     }
 
     /// <summary>

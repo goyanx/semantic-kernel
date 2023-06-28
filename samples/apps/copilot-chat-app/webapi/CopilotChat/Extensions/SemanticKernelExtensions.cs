@@ -9,12 +9,14 @@ using SemanticKernel.Service.CopilotChat.Options;
 using SemanticKernel.Service.CopilotChat.Skills.ChatSkills;
 using SemanticKernel.Service.CopilotChat.Storage;
 using SemanticKernel.Service.Options;
-
-namespace SemanticKernel.Service.CopilotChat.Extensions;
+using Utils;
 
 /// <summary>
 /// Extension methods for registering Copilot Chat components to Semantic Kernel.
 /// </summary>
+/// 
+namespace SemanticKernel.Service.CopilotChat.Extensions;
+
 public static class CopilotChatSemanticKernelExtensions
 {
     /// <summary>
@@ -27,12 +29,13 @@ public static class CopilotChatSemanticKernelExtensions
         {
             IKernel plannerKernel = Kernel.Builder
                 .WithLogger(sp.GetRequiredService<ILogger<IKernel>>())
+                .WithOpenAIImageGenerationService(Env.Var("OPENAI_API_KEY"))
+
                 // TODO verify planner has AI service configured
                 .WithPlannerBackend(sp.GetRequiredService<IOptions<AIServiceOptions>>().Value)
                 .Build();
             return new CopilotChatPlanner(plannerKernel, plannerOptions?.Value);
         });
-
         // Register Planner skills (AI plugins) here.
         // TODO: Move planner skill registration from ChatController to here.
 
@@ -66,7 +69,7 @@ public static class CopilotChatSemanticKernelExtensions
         return options.Type switch
         {
             AIServiceOptions.AIServiceType.AzureOpenAI => kernelBuilder.WithAzureChatCompletionService(options.Models.Planner, options.Endpoint, options.Key),
-            AIServiceOptions.AIServiceType.OpenAI => kernelBuilder.WithOpenAIChatCompletionService(options.Models.Planner, options.Key),
+            AIServiceOptions.AIServiceType.OpenAI => kernelBuilder.WithOpenAIImageGenerationService(Env.Var("OPENAI_API_KEY")).WithOpenAIChatCompletionService(options.Models.Planner, options.Key),
             _ => throw new ArgumentException($"Invalid {nameof(options.Type)} value in '{AIServiceOptions.PropertyName}' settings."),
         };
     }

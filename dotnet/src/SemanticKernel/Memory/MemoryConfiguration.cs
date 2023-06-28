@@ -1,6 +1,6 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 
-using System.Diagnostics.CodeAnalysis;
+using System.Linq;
 using Microsoft.SemanticKernel.AI.Embeddings;
 using Microsoft.SemanticKernel.Diagnostics;
 using Microsoft.SemanticKernel.Memory;
@@ -34,12 +34,47 @@ public static class MemoryConfiguration
     /// <param name="kernel">Kernel instance</param>
     /// <param name="embeddingGenerator">Embedding generator</param>
     /// <param name="storage">Memory storage</param>
-    [SuppressMessage("Reliability", "CA2000:Dispose objects before losing scope", Justification = "The embeddingGenerator object is disposed by the kernel")]
     public static void UseMemory(this IKernel kernel, ITextEmbeddingGeneration embeddingGenerator, IMemoryStore storage)
     {
         Verify.NotNull(storage);
         Verify.NotNull(embeddingGenerator);
 
-        kernel.RegisterMemory(new SemanticTextMemory(storage, embeddingGenerator));
+        var memory = CreateSemanticTextMemory(storage, embeddingGenerator);
+
+        kernel.RegisterMemory(memory);
+    }
+
+    /// <summary>
+    /// Create <see cref="SemanticTextMemory"/> or <see cref="SemanticTextMemory{TFilter}"/> based on <paramref name="memoryStore"/>.
+    /// </summary>
+    /// <param name="memoryStore">Memory storage</param>
+    /// <param name="embeddingGenerator">Embedding generator</param>
+    /// <returns></returns>
+    private static ISemanticTextMemory CreateSemanticTextMemory(IMemoryStore memoryStore, ITextEmbeddingGeneration embeddingGenerator)
+    {
+        var memoryStoreType = memoryStore.GetType();
+        var filterableMemoryStoreInterfaceType = memoryStoreType
+            .GetInterfaces()
+            .SingleOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IMemoryStore<>));
+
+        if (filterableMemoryStoreInterfaceType != null)
+        {
+            var filterType = filterableMemoryStoreInterfaceType
+                .GetGenericArguments()
+                .Single();
+
+            var textEmbeddingGenerationType = typeof(ITextEmbeddingGeneration);
+            var filterableSemanticTextMemoryType = typeof(SemanticTextMemory<>).MakeGenericType(filterType);
+            var constructor = filterableSemanticTextMemoryType.GetConstructor(new[] { memoryStoreType, textEmbeddingGenerationType });
+            if (constructor == null)
+            {
+                throw new System.InvalidOperationException(
+                    $"No {filterableSemanticTextMemoryType.FullName} constructor with parameter types: {memoryStoreType.FullName}, {textEmbeddingGenerationType.FullName} found.");
+            }
+
+            return (ISemanticTextMemory)constructor.Invoke(new object[] { memoryStore, embeddingGenerator });
+        }
+
+        return new SemanticTextMemory(memoryStore, embeddingGenerator);
     }
 }

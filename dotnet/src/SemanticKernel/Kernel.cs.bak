@@ -46,9 +46,6 @@ public sealed class Kernel : IKernel, IDisposable
     public ISemanticTextMemory Memory => this._memory;
 
     /// <inheritdoc/>
-    public ISemanticTextMemory<TFilter>? GetFilterableMemory<TFilter>() => this._memory as ISemanticTextMemory<TFilter>;
-
-    /// <inheritdoc/>
     public IReadOnlySkillCollection Skills => this._skillCollection.ReadOnlySkillCollection;
 
     /// <inheritdoc/>
@@ -113,8 +110,6 @@ public sealed class Kernel : IKernel, IDisposable
     /// <inheritdoc/>
     public IDictionary<string, ISKFunction> ImportSkill(object skillInstance, string? skillName = null, ITrustService? trustService = null)
     {
-        Verify.NotNull(skillInstance);
-
         if (string.IsNullOrWhiteSpace(skillName))
         {
             skillName = SkillCollection.GlobalSkill;
