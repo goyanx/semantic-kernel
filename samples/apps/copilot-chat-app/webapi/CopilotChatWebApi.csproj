@@ -13,9 +13,14 @@
   <ItemGroup>
     <PackageReference Include="Microsoft.Azure.Cosmos" Version="3.34.0" />
     <PackageReference Include="Microsoft.SemanticKernel" Version="0.15.230609.2-preview" />
+     <!--ProjectReference Include="..\..\..\..\dotnet\src\SemanticKernel\SemanticKernel.csproj"/>
+     <ProjectReference Include="..\..\..\..\dotnet\src\SemanticKernel.Abstractions\SemanticKernel.Abstractions.csproj"/-->
+
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.AI.OpenAI" Version="0.15.230609.2-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Connectors.Memory.AzureCognitiveSearch" Version="0.15.230609.2-preview" />
-    <PackageReference Include="Microsoft.SemanticKernel.Connectors.Memory.Qdrant" Version="0.15.230609.2-preview" />
+    <!--PackageReference Include="Microsoft.SemanticKernel.Connectors.Memory.Qdrant" Version="0.15.230609.2-preview" /-->
+    <!--ProjectReference Include="..\..\..\..\dotnet\src\Connectors\Connectors.Memory.Qdrant\Connectors.Memory.Qdrant.csproj" /-->
+   
     <PackageReference Include="Microsoft.SemanticKernel.Skills.MsGraph" Version="0.15.230609.2-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Skills.OpenAPI" Version="0.15.230609.2-preview" />
     <PackageReference Include="Microsoft.SemanticKernel.Skills.Web" Version="0.15.230609.2-preview" />

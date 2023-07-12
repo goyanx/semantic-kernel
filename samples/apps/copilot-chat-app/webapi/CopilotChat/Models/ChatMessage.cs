@@ -110,6 +110,9 @@ public class ChatMessage : IStorageEntity
     [JsonPropertyName("type")]
     public ChatMessageType Type { get; set; }
 
+    /// <summary>
+    /// image url to the bot's message by DALLE.
+    /// </summary>
     [JsonPropertyName("imageUrl")]
     public string ImageUrl { get; set; }
 
@@ -123,6 +126,7 @@ public class ChatMessage : IStorageEntity
     /// <param name="prompt">The prompt used to generate the message</param>
     /// <param name="authorRole">Role of the author</param>
     /// <param name="type">Type of the message</param>
+    /// <param name="imageUrl">image url of for this message</param>
     public ChatMessage(string userId, string userName, string chatId, string content, string prompt = "", AuthorRoles authorRole = AuthorRoles.User, ChatMessageType type = ChatMessageType.Message, string imageUrl = "")
     {
         this.Timestamp = DateTimeOffset.Now;

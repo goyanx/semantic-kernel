@@ -130,7 +130,7 @@ public class BotController : ControllerBase
             {
                 Timestamp = message.Timestamp
             };
-            chatMessage.ImageUrl = message.ImageUrl;
+            //chatMessage.ImageUrl = message.ImageUrl; //TODO not sure if this should be here
             await this._chatMessageRepository.CreateAsync(chatMessage);
         }
 

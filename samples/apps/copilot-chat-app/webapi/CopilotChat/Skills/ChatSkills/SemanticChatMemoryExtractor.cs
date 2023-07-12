@@ -123,6 +123,8 @@ internal static class SemanticChatMemoryExtractor
     {
         var memoryCollectionName = SemanticChatMemoryExtractor.MemoryCollectionName(chatId, memoryName);
 
+
+
         var memories = await context.Memory.SearchAsync(
                 collection: memoryCollectionName,
                 query: item.ToFormattedString(),
@@ -139,6 +141,7 @@ internal static class SemanticChatMemoryExtractor
                 collection: memoryCollectionName,
                 text: item.ToFormattedString(),
                 id: Guid.NewGuid().ToString(),
+                additionalMetadata: item.Category,
                 description: memoryName,
                 cancellationToken: context.CancellationToken
             );
