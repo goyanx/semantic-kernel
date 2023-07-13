@@ -13,7 +13,7 @@ internal sealed class SearchVectorsRequest : IValidatable
     public IEnumerable<float> StartingVector { get; set; } = System.Array.Empty<float>();
 
     [JsonPropertyName("filter")]
-    public Filter Filters { get; set; }
+    public QdrantFilter Filters { get; set; }
 
     [JsonPropertyName("limit")]
     public int Limit { get; set; }
@@ -65,6 +65,14 @@ internal sealed class SearchVectorsRequest : IValidatable
             }
         }
 
+        return this;
+    }
+
+    public SearchVectorsRequest WithFilters(QdrantFilter? filters)
+    {
+        if (filters == null) { return this; }
+
+        this.Filters = filters;
         return this;
     }
 
